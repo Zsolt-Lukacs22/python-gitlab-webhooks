@@ -1,5 +1,4 @@
-FROM python:2.7-alpine
-MAINTAINER "Matjaž Finžgar" <matjaz@finzgar.net>
+FROM python:3.12-alpine3.18
 
 WORKDIR /app
 
@@ -8,5 +7,4 @@ RUN pip install -r requirements.txt
 
 COPY . /app
 
-EXPOSE 5000
 CMD ["python", "webhooks.py"]
