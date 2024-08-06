@@ -58,16 +58,26 @@ argumentParser.add_argument("--debug", default=True, action="store_true")
 cliArguments = argumentParser.parse_args()
 logging.info("Received CLI arguments:\n{}".format(dumps(vars(cliArguments), indent=4)))
 
+path = normpath(abspath(dirname(__file__)))
+
+# Load config
+with open(join(path, "config.json"), "r") as cfg:
+    config = loads(cfg.read())
+
+
+def _verify_token(received_token: str) -> bool:
+    acceptable_token = config["token"]
+    return acceptable_token == received_token
+
 
 @application.route("/", methods=["POST"])
-def index():
-    path = normpath(abspath(dirname(__file__)))
-
-    # Load config
-    with open(join(path, "config.json"), "r") as cfg:
-        config = loads(cfg.read())
-
+def index():  # NOSONAR
     hooks = config.get("hooks_path", join(path, "hooks"))
+
+    if "X-Gitlab-Token" not in request.headers or not _verify_token(
+        request.headers["X-Gitlab-Token"]
+    ):
+        abort(401)
 
     # Gather data
     try:
