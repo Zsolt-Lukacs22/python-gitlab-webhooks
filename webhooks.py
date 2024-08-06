@@ -101,6 +101,9 @@ def index():  # NOSONAR
         elif event in ["push"]:
             # Push events provide a full Git ref in 'ref'
             branch = payload["ref"].split("/", 2)[2]
+        elif event in ["note"]:
+            # Very similar to the MR case
+            branch = payload["merge_request"]["target_branch"]
     except KeyError:
         # If the payload structure isn't what we expect, we'll live without
         # the branch name
